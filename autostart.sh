@@ -9,4 +9,4 @@ swaync &
 swww init &
 wlsunset -l 49.8 -L 97.1 &
 wl-mpris-idle-inhibit &
-swayidle -w timeout 3000 swaylock -f -c 000000 timeout 6000 swaymsg "output * dpms off" resume swaymsg "output * dpms on" before-sleep swaylock -f -c 000000 &
+swayidle -w timeout 300 swaylock -f -c 000000 timeout 600 swaymsg "output * dpms off" resume swaymsg "output * dpms on" before-sleep swaylock -f -c 000000 &
