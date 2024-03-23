@@ -16,8 +16,8 @@ from libqtile.backend import base
 from libqtile.backend.wayland.inputs import InputConfig
 
 # Set environment variables to ensure applications utilize correct settings
-os.environ["XDG_SESSION_DESKTOP"] = "qtile:wlroots"
-os.environ["XDG_CURRENT_DESKTOP"] = "qtile:wlroots"
+os.environ["XDG_SESSION_DESKTOP"] = "qtile"
+os.environ["XDG_CURRENT_DESKTOP"] = "qtile"
 
 # Set home directory
 home = str(Path.home())
@@ -518,14 +518,6 @@ extension_defaults = widget_defaults.copy()
 # ----------------------
 
 
-def task_list_fix(text):
-    browsers = ["Chromium", "Firefox"]
-    for browser in browsers:
-        if browser in text:
-            return browser
-    return text
-
-
 widget_list = [
     widget.CurrentLayoutIcon(scale=0.75),
     widget.TextBox(text="|", foreground=Color4),
@@ -565,22 +557,6 @@ widget_list = [
         mouse_callbacks={"Button1": lazy.group["6"].dropdown_toggle("calendar")},
     ),
     widget.TextBox(text="|", foreground=Color4),
-    widget.WidgetBox(
-        text_closed="󱂬",
-        text_open="󱂬",
-        widgets=[
-            widget.TaskList(
-                border=Color3,
-                borderwidth=1,
-                font="JetBrainsMono Nerd Font Propo",
-                fontsize=10,
-                rounded=False,
-                theme_mode="preferred",
-                icon_size=12,
-                parse_text=task_list_fix,
-            ),
-        ],
-    ),
     widget.Spacer(),
     widget.Clock(
         format="%Y-%m-%d | %I:%M %p  ",  # Spacing required
@@ -784,7 +760,8 @@ floating_layout = layout.Floating(
         Match(wm_class="tridactyl"),
         Match(wm_class="wdisplays"),
         Match(wm_class="wlroots"),
-        # Match(wm_class="zoom"),
+        Match(wm_class="zoom"),
+        Match(title=re.compile("^zoom$"), wm_class="Zoom"),
         Match(wm_type="dialog"),
     ]
 )
@@ -820,8 +797,6 @@ wl_input_rules = {
     ),
 }
 
-# We choose LG3D to maximize irony: it is a 3D non-reparenting WM written in
-# java that happens to be on java's whitelist.
 wmname = "QTILE"
 
 # HOOK Startup
@@ -833,7 +808,34 @@ def autostart():
     subprocess.Popen([autorun])
 
 
-# @hook.subscribe.startup
-# def logon():
-#     autorun = os.path.expanduser("~/.config/qtile/logon.sh")
-#     subprocess.Popen([autorun])
+@hook.subscribe.startup
+def logon():
+    refresh = os.path.expanduser("~/scripts/calcurseupdate.sh")
+    subprocess.Popen([refresh])
+
+
+# Settings that work, but we don't need anymore
+#
+# def task_list_fix(text):
+#     browsers = ["Chromium", "Firefox"]
+#     for browser in browsers:
+#         if browser in text:
+#             return browser
+#     return text
+
+# widget.WidgetBox(
+#     text_closed="󱂬",
+#     text_open="󱂬",
+#     widgets=[
+#         widget.TaskList(
+#             border=Color3,
+#             borderwidth=1,
+#             font="JetBrainsMono Nerd Font Propo",
+#             fontsize=10,
+#             rounded=False,
+#             theme_mode="preferred",
+#             icon_size=12,
+#             parse_text=task_list_fix,
+#         ),
+#     ],
+# ),
