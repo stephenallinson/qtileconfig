@@ -2,6 +2,8 @@ import os
 import subprocess
 import re
 import json
+import random
+import journaling.main as journal
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from libqtile import hook
@@ -40,6 +42,39 @@ app_launcher = "rofi"
 
 
 # Custom Functions
+
+
+def show_journal_ideas(qtile):
+    controls = [
+        PopupText(
+            row=0,
+            col=0,
+            can_focus=True,
+            background="#1C1B1A",
+            highlight="#1C1B1A",
+            highlight_radius=0,
+            background_highlighted="#282726",
+            foreground=Color4,
+            foreground_highlighted=Color5,
+            font="JetBrainsMono NFP",
+            fontsize=14,
+            h_align="left",
+            text=journal.journal_prompt(random.randint(0, 4)),
+        )
+    ]
+    layout = PopupGridLayout(
+        qtile,
+        controls=controls,
+        border=Color3,
+        border_width=1,
+        height=575,
+        width=600,
+        keyboard_navigation=False,
+        cols=1,
+        rows=1,
+        initial_focus=None,
+    )
+    layout.show(centered=True)
 
 
 def show_clocks(qtile):
@@ -554,7 +589,10 @@ widget_list = [
         fmt=" {}",
         max_chars=25,
         update_interval=300,
-        mouse_callbacks={"Button1": lazy.group["6"].dropdown_toggle("calendar")},
+        mouse_callbacks={
+            "Button1": lazy.group["6"].dropdown_toggle("calendar"),
+            "Button3": lazy.function(show_journal_ideas),
+        },
     ),
     widget.TextBox(text="|", foreground=Color4),
     widget.Spacer(),
