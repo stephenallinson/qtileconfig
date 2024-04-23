@@ -440,6 +440,15 @@ groups.append(
                 height=0.80,
                 on_focus_lost_hide=True,
             ),
+            DropDown(
+                "whiteboard",
+                "lorien",
+                x=0.1,
+                y=0.1,
+                width=0.80,
+                height=0.80,
+                on_focus_lost_hide=False,
+            ),
         ],
     )
 )
@@ -451,6 +460,7 @@ keys.extend(
         Key([mod], "F9", lazy.group["6"].dropdown_toggle("spotify")),
         Key([mod], "F10", lazy.group["6"].dropdown_toggle("btop")),
         Key([mod], "F11", lazy.group["6"].dropdown_toggle("calendar")),
+        Key([mod], "F12", lazy.group["6"].dropdown_toggle("whiteboard")),
     ]
 )
 
@@ -595,6 +605,16 @@ widget_list = [
         },
     ),
     widget.TextBox(text="|", foreground=Color4),
+    widget.GenPollCommand(
+        update_interval=1,
+        cmd=f"{home}/scripts/idleinhibit.sh",
+        fmt="{}",
+        mouse_callbacks={
+            "Button1": lambda: qtile.cmd_spawn(
+                f"{home}/scripts/idleinhibit.sh toggle",
+            ),
+        },
+    ),
     widget.Spacer(),
     widget.Clock(
         format="%Y-%m-%d | %I:%M %p  ",  # Spacing required
