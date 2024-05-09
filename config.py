@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 from libqtile import hook
 from libqtile import qtile
 from libqtile import bar, layout, widget
-from qtile_extras.widget import StatusNotifier
+from qtile_extras.widget import StatusNotifier, UnitStatus
 from qtile_extras.popup.toolkit import PopupGridLayout, PopupText
 from libqtile.config import Click, Drag, Group, Key, Match, Screen, ScratchPad, DropDown
 from libqtile.lazy import lazy
@@ -564,7 +564,40 @@ extension_defaults = widget_defaults.copy()
 
 
 widget_list = [
-    widget.CurrentLayoutIcon(scale=0.75),
+    widget.TextBox(text="|", foreground=Color4),
+    widget.WidgetBox(
+        # WidgetBox Settings
+        close_button_location="left",
+        fontsize="16",
+        text_closed="󰣇",
+        text_open="󰣇",
+        # WidgetBox Contents
+        widgets=[
+            widget.TextBox(text=">", foreground=Color4),
+            widget.CurrentLayoutIcon(scale=0.65),
+            widget.TextBox(text=">", foreground=Color4),
+            UnitStatus(
+                bus_name="system",
+                unitname="openfortivpn.service",
+                label="VPN",
+                colour_active="66800B",
+                colour_inactive="403E3C",
+                colour_dead="AF3029",
+                colour_failed="A02F6F",
+            ),
+            widget.TextBox(text=">", foreground=Color4),
+            widget.GenPollCommand(
+                update_interval=1,
+                cmd=f"{home}/scripts/idleinhibit.sh",
+                fmt="{}",
+                mouse_callbacks={
+                    "Button1": lambda: qtile.cmd_spawn(
+                        f"{home}/scripts/idleinhibit.sh toggle",
+                    ),
+                },
+            ),
+        ],
+    ),
     widget.TextBox(text="|", foreground=Color4),
     widget.GroupBox(
         visible_groups=["1", "2", "3", "4", "5"],
@@ -605,16 +638,6 @@ widget_list = [
         },
     ),
     widget.TextBox(text="|", foreground=Color4),
-    widget.GenPollCommand(
-        update_interval=1,
-        cmd=f"{home}/scripts/idleinhibit.sh",
-        fmt="{}",
-        mouse_callbacks={
-            "Button1": lambda: qtile.cmd_spawn(
-                f"{home}/scripts/idleinhibit.sh toggle",
-            ),
-        },
-    ),
     widget.Spacer(),
     widget.Clock(
         format="%Y-%m-%d | %I:%M %p  ",  # Spacing required
@@ -634,9 +657,9 @@ widget_list = [
     widget.TextBox(text="|", foreground=Color4),
     widget.CheckUpdates(
         custom_command="checkupdates",
-        display_format="󰣇 {updates}",
+        display_format="󰚰 {updates}",
         update_interval=900,
-        no_update_string="󰣇 0",
+        no_update_string="󰚰 0",
         mouse_callbacks={"Button1": lazy.spawn(f"{terminal} -e yay")},
     ),
     widget.TextBox(text="|", foreground=Color4),
