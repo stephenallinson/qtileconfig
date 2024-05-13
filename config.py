@@ -596,6 +596,11 @@ widget_list = [
                     ),
                 },
             ),
+            StatusNotifier(
+                menu_font="JetBrainsMono Nerd Font Propo",
+                menu_foreground="#FFFFFF",
+                menu_border=Color1,
+            ),
         ],
     ),
     widget.TextBox(text="|", foreground=Color4),
@@ -649,11 +654,6 @@ widget_list = [
         },
     ),
     widget.Spacer(),
-    StatusNotifier(
-        menu_font="JetBrainsMono Nerd Font Propo",
-        menu_foreground="#FFFFFF",
-        menu_border=Color1,
-    ),
     widget.TextBox(text="|", foreground=Color4),
     widget.CheckUpdates(
         custom_command="checkupdates",
