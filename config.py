@@ -596,6 +596,7 @@ widget_list = [
                     ),
                 },
             ),
+            widget.TextBox(text=">", foreground=Color4),
             StatusNotifier(
                 menu_font="JetBrainsMono Nerd Font Propo",
                 menu_foreground="#FFFFFF",
