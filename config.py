@@ -449,12 +449,22 @@ groups.append(
                 height=0.80,
                 on_focus_lost_hide=False,
             ),
+            DropDown(
+                "daynote",
+                f"{terminal} -e {home}/scripts/day.sh",
+                x=0.3,
+                y=0.1,
+                width=0.40,
+                height=0.80,
+                on_focus_lost_hide=False,
+            ),
         ],
     )
 )
 
 keys.extend(
     [
+        Key([mod], "F1", lazy.group["6"].dropdown_toggle("daynote")),
         Key([mod], "F5", lazy.group["6"].dropdown_toggle("chatgpt")),
         Key([mod], "F6", lazy.group["6"].dropdown_toggle("dynalist")),
         Key([mod], "F9", lazy.group["6"].dropdown_toggle("spotify")),
