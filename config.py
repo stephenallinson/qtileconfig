@@ -298,6 +298,9 @@ keys = [
         lazy.window.static(screen=0, x=1353, y=26, width=570, height=321),
         desc="Make window static in upper right corner of Monitor 0",
     ),
+    # Search Obsidian Notes
+    Key([mod], "o", lazy.spawn(f"{home}/scripts/notes.sh")),
+    Key([mod, shift], "o", lazy.spawn(f"{home}/scripts/notegrep.sh")),
 ]
 
 # ----------------------
@@ -824,6 +827,7 @@ floating_layout = layout.Floating(
         Match(title="Unlock Database - KeePassXC"),
         Match(title="KeePassXC -  Access Request"),
         Match(title=re.compile("Presenting: .*"), wm_class="libreoffice-impress"),
+        Match(wm_class=re.compile(r"^([Ss]team)$")),
         Match(wm_class="Arandr"),
         Match(wm_class="Dragon"),
         Match(wm_class="Dragon-drag-and-drop"),
@@ -853,10 +857,31 @@ floating_layout = layout.Floating(
         Match(wm_class="wdisplays"),
         Match(wm_class="wlroots"),
         Match(wm_class="zoom"),
-        Match(title=re.compile("^zoom$"), wm_class="Zoom"),
+        Match(title=re.compile(r"^zoom$"), wm_class="Zoom"),
         Match(wm_type="dialog"),
     ]
 )
+floating_types = [
+    "notification",
+    "toolbar",
+    "splash",
+    "dialog",
+    "utility",
+    "menu",
+    "dropdown_menu",
+    "popup_menu",
+    "tooltip,dock",
+]
+
+
+@hook.subscribe.client_new
+def set_floating(window):
+    if (
+        window.window.get_wm_transient_for()
+        or window.window.get_wm_type() in floating_types
+    ):
+        window.floating = True
+
 
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
