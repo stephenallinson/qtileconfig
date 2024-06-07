@@ -873,16 +873,6 @@ floating_types = [
     "tooltip,dock",
 ]
 
-
-@hook.subscribe.client_new
-def set_floating(window):
-    if (
-        window.window.get_wm_transient_for()
-        or window.window.get_wm_type() in floating_types
-    ):
-        window.floating = True
-
-
 # If things like steam games want to auto-minimize themselves when losing
 # focus, should we respect this or not?
 auto_minimize = True
