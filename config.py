@@ -121,6 +121,7 @@ def show_clocks(qtile):
     layout.show(centered=True)
 
 
+# Custom Window Behaviour
 @lazy.group.function
 def cycle_windows(group, forwards=True):
     current = group.current_window
@@ -159,6 +160,42 @@ def float_to_front(qtile):
     for window in qtile.current_group.windows:
         if window.floating:
             window.bring_to_front()
+
+
+# Sticky Window Functionality
+sticky_windows = []
+
+
+@lazy.function
+def toggle_sticky_windows(qtile, window=None):
+    if window is None:
+        window = qtile.current_screen.group.current_window
+    if window in sticky_windows:
+        sticky_windows.remove(window)
+    else:
+        sticky_windows.append(window)
+    return window
+
+
+@hook.subscribe.setgroup
+def move_sticky_windows():
+    for window in sticky_windows:
+        window.togroup()
+        window.bring_to_front()
+    return
+
+
+@hook.subscribe.client_killed
+def remove_sticky_windows(window):
+    if window in sticky_windows:
+        sticky_windows.remove(window)
+
+
+@hook.subscribe.client_managed
+def auto_sticky_windows(window):
+    info = window.info()
+    if info["wm_class"] == ["firefox"] and info["name"] == "Picture-in-Picture":
+        sticky_windows.append(window)
 
 
 keys = [
@@ -295,8 +332,8 @@ keys = [
     Key(
         [mod, shift],
         "f",
-        lazy.window.static(screen=0, x=1353, y=26, width=570, height=321),
-        desc="Make window static in upper right corner of Monitor 0",
+        toggle_sticky_windows(),
+        desc="Toggle Sticky Windows",
     ),
     # Search Obsidian Notes
     Key([mod], "o", lazy.spawn(f"{home}/scripts/notes.sh")),
