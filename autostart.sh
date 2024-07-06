@@ -1,7 +1,6 @@
 #!/bin/sh
 # Autostart for Qtile Configuration
 #
-# Set screen resolution according to kanshi to double DPI scale
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 kanshi &
 playerctld daemon &
