@@ -182,6 +182,7 @@ def move_sticky_windows():
     for window in sticky_windows:
         window.togroup()
         window.bring_to_front()
+        qtile.current_screen.group.focus_back()
     return
 
 
@@ -195,6 +196,7 @@ def remove_sticky_windows(window):
 def auto_sticky_windows(window):
     info = window.info()
     if info["wm_class"] == ["firefox"] and info["name"] == "Picture-in-Picture":
+        window.set_position_floating(1164, 38)
         sticky_windows.append(window)
 
 
@@ -285,7 +287,8 @@ keys = [
     Key(
         [mod, ctrl],
         "r",
-        lazy.spawn(f"{home}/scripts/updatewal.sh"),
+        lazy.spawn(f"{home}/scripts/updatewal.sh"),  # Update the colorscheme
+        lazy.spawn(f"{home}/scripts/calcurseupdate.sh"),  # Update the calendar widget
         desc="Reload the config",
     ),
     Key(
@@ -751,6 +754,7 @@ widget_list = [
         empty_char="X",
         not_charging_char="󰁹",
         notify_below=0.1,
+        show_short_text=False,
     ),
     widget.TextBox(text="|", foreground=Color4),
     widget.TextBox(
@@ -841,6 +845,9 @@ reconfigure_screens = True
 # ------------------------
 
 floating_layout = layout.Floating(
+    border_width=1,
+    border_focus=Color2,
+    border_normal=Color3,
     float_rules=[
         # Run the utility of `xprop` to see the wm class an X client.
         *layout.Floating.default_float_rules,
@@ -896,7 +903,7 @@ floating_layout = layout.Floating(
         Match(wm_class="zoom"),
         Match(title=re.compile(r"^zoom$"), wm_class="Zoom"),
         Match(wm_type="dialog"),
-    ]
+    ],
 )
 floating_types = [
     "notification",
