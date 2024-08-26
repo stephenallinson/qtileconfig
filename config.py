@@ -501,6 +501,15 @@ groups.append(
                 height=0.80,
                 on_focus_lost_hide=False,
             ),
+            DropDown(
+                "missioncenter",
+                "missioncenter",
+                x=0.1,
+                y=0.1,
+                width=0.80,
+                height=0.80,
+                on_focus_lost_hide=True,
+            ),
         ],
     )
 )
@@ -514,6 +523,7 @@ keys.extend(
         Key([mod], "F10", lazy.group["6"].dropdown_toggle("btop")),
         Key([mod], "F11", lazy.group["6"].dropdown_toggle("calendar")),
         Key([mod], "F12", lazy.group["6"].dropdown_toggle("whiteboard")),
+        Key([mod, shift], "Escape", lazy.group["6"].dropdown_toggle("missioncenter")),
     ]
 )
 
@@ -618,44 +628,10 @@ extension_defaults = widget_defaults.copy()
 
 widget_list = [
     widget.TextBox(text="|", foreground=Color4),
-    widget.WidgetBox(
-        # WidgetBox Settings
-        close_button_location="left",
-        fontsize="16",
-        text_closed="󰣇",
-        text_open="󰣇",
-        # WidgetBox Contents
-        widgets=[
-            widget.TextBox(text=">", foreground=Color4),
-            widget.CurrentLayoutIcon(scale=0.65),
-            widget.TextBox(text=">", foreground=Color4),
-            UnitStatus(
-                bus_name="system",
-                unitname="openfortivpn.service",
-                label="VPN",
-                colour_active="66800B",
-                colour_inactive="403E3C",
-                colour_dead="AF3029",
-                colour_failed="A02F6F",
-            ),
-            widget.TextBox(text=">", foreground=Color4),
-            widget.GenPollCommand(
-                update_interval=1,
-                cmd=f"{home}/scripts/idleinhibit.sh",
-                fmt="{}",
-                mouse_callbacks={
-                    "Button1": lambda: qtile.cmd_spawn(
-                        f"{home}/scripts/idleinhibit.sh toggle",
-                    ),
-                },
-            ),
-            widget.TextBox(text=">", foreground=Color4),
-            StatusNotifier(
-                menu_font="JetBrainsMono Nerd Font Propo",
-                menu_foreground="#FFFFFF",
-                menu_border=Color1,
-            ),
-        ],
+    widget.TextBox(
+        text="󰣇",
+        foreground="FFFFFF",
+        mouse_callbacks={"Button1": lambda: qtile.cmd_hide_show_bar("bottom")},
     ),
     widget.TextBox(text="|", foreground=Color4),
     widget.GroupBox(
@@ -695,6 +671,23 @@ widget_list = [
             "Button1": lazy.group["6"].dropdown_toggle("calendar"),
             "Button3": lazy.function(show_journal_ideas),
         },
+    ),
+    widget.TextBox(text="|", foreground=Color4),
+    widget.Pomodoro(
+        color_active=Color7,
+        color_break=Color7,
+        color_inactive="FFFFFF",
+        fmt="{}",
+        length_pomodori=30,
+        length_short_break=10,
+        length_long_break=20,
+        notification_on=False,
+        num_pomodori=3,
+        prefix_active="󱎫 ",
+        prefix_break="󱋒 ",
+        prefix_inactive="󱎫",
+        prefix_long_break="󰤄 ",
+        prefix_paused="󱎫 ",
     ),
     widget.TextBox(text="|", foreground=Color4),
     widget.Spacer(),
@@ -767,7 +760,12 @@ widget_list = [
 widget_list_second = [
     widget.CurrentLayoutIcon(scale=0.75),
     widget.Spacer(),
-    widget.Clock(format="%Y-%m-%d | %I:%M %p  "),
+    widget.Clock(
+        format="%Y-%m-%d | %I:%M %p  ",
+        mouse_callbacks={
+            "Button1": lambda: qtile.spawn(f"{home}/scripts/controlcenter.sh"),
+        },
+    ),
     widget.Spacer(),
     widget.GroupBox(
         visible_groups=["11", "12", "13"],
@@ -785,6 +783,60 @@ widget_list_second = [
     ),
 ]
 
+widget_list_bottom = [
+    widget.TextBox(text="|", foreground=Color4),
+    widget.TaskList(
+        border=Color3,
+        borderwidth=1,
+        font="JetBrainsMono Nerd Font Propo",
+        margin_y=1,
+        max_title_width=300,
+        padding_y=1,
+        highlight_method="block",
+        rounded=False,
+        theme_mode="preferred",
+    ),
+    widget.Spacer(),
+    widget.TextBox(text="|", foreground=Color4),
+    UnitStatus(
+        bus_name="system",
+        unitname="openfortivpn.service",
+        label="VPN",
+        colour_active="66800B",
+        colour_inactive="403E3C",
+        colour_dead="AF3029",
+        colour_failed="A02F6F",
+    ),
+    widget.TextBox(text="|", foreground=Color4),
+    widget.GenPollCommand(
+        update_interval=1,
+        cmd=f"{home}/scripts/idleinhibit.sh",
+        fmt="{}",
+        mouse_callbacks={
+            "Button1": lambda: qtile.cmd_spawn(
+                f"{home}/scripts/idleinhibit.sh toggle",
+            ),
+        },
+    ),
+    widget.TextBox(text="|", foreground=Color4),
+    widget.Mpris2(
+        format="{xesam:title} - {xesam:artist}",
+        scroll=False,
+        paused_text=" {track}",
+        playing_text=" {track}",
+        stopped_text="  ",
+    ),
+    widget.TextBox(text="|", foreground=Color4),
+    StatusNotifier(
+        menu_font="JetBrainsMono Nerd Font Propo",
+        menu_foreground="#FFFFFF",
+        menu_border=Color1,
+    ),
+    widget.TextBox(text="|", foreground=Color4),
+    widget.CurrentLayoutIcon(scale=0.65),
+    widget.TextBox(text="|", foreground=Color4),
+]
+
 # --------------------
 # Screen Configuration
 # --------------------
@@ -798,7 +850,15 @@ screens = [
             opacity=0.7,
             border_width=[2, 0, 2, 0],
             margin=[0, 0, 0, 0],
-        )
+        ),
+        bottom=bar.Bar(
+            widget_list_bottom,
+            24,
+            background="#000000",
+            opacity=1,
+            border_width=[2, 0, 2, 0],
+            margin=[0, 0, 0, 0],
+        ),
     ),
     Screen(
         top=bar.Bar(
@@ -903,6 +963,7 @@ floating_layout = layout.Floating(
         Match(wm_class="zoom"),
         Match(title=re.compile(r"^zoom$"), wm_class="Zoom"),
         Match(wm_type="dialog"),
+        Match(title=re.compile("Write: .*")),
     ],
 )
 floating_types = [
@@ -963,6 +1024,7 @@ def autostart():
 def logon():
     refresh = os.path.expanduser("~/scripts/calcurseupdate.sh")
     subprocess.Popen([refresh])
+    qtile.cmd_hide_show_bar("bottom")
 
 
 # Settings that work, but we don't need anymore
