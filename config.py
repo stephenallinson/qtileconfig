@@ -192,12 +192,12 @@ def remove_sticky_windows(window):
         sticky_windows.remove(window)
 
 
-@hook.subscribe.client_managed
-def auto_sticky_windows(window):
-    info = window.info()
-    if info["wm_class"] == ["firefox"] and info["name"] == "Picture-in-Picture":
-        window.set_position_floating(1164, 38)
-        sticky_windows.append(window)
+# @hook.subscribe.client_managed
+# def auto_sticky_windows(window):
+#     info = window.info()
+#     if info["wm_class"] == ["firefox"] and info["name"] == "Picture-in-Picture":
+#         window.set_position_floating(1164, 38)
+#         sticky_windows.append(window)
 
 
 keys = [
@@ -281,6 +281,7 @@ keys = [
         lazy.spawn(f"{home}/scripts/controlcenter.sh"),
         desc="Launch notification center",
     ),
+    Key([mod], "home", lazy.spawn(f"{home}/scripts/tasks.sh"), desc="Add Task"),
     # Kill Window with SUPER+q
     Key([mod], "q", lazy.window.kill(), desc="Kill focused window"),
     # Reload the config and then apply themes
@@ -681,7 +682,7 @@ widget_list = [
         length_pomodori=30,
         length_short_break=10,
         length_long_break=20,
-        notification_on=False,
+        notification_on=True,
         num_pomodori=3,
         prefix_active="󱎫 ",
         prefix_break="󱋒 ",
@@ -735,9 +736,17 @@ widget_list = [
         mouse_callbacks={"Button1": lazy.spawn(f"{terminal} -e nmtui")},
     ),
     widget.TextBox(text="|", foreground=Color4),
-    widget.CPU(update_interval=15, format=" {load_percent}%"),
+    widget.CPU(
+        update_interval=15,
+        format=" {load_percent}%",
+        mouse_callbacks={"Button1": lazy.group["6"].dropdown_toggle("btop")},
+    ),
     widget.TextBox(text="|", foreground=Color4),
-    widget.Memory(measure_mem="G", format=" {MemUsed:.0f}{mm}B"),
+    widget.Memory(
+        measure_mem="G",
+        format=" {MemUsed:.0f}{mm}B",
+        mouse_callbacks={"Button1": lazy.group["6"].dropdown_toggle("btop")},
+    ),
     widget.TextBox(text="|", foreground=Color4),
     widget.Battery(
         format="{char} {percent:2.0%}",
