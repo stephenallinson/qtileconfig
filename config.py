@@ -1,21 +1,20 @@
-import os
-import subprocess
-import re
 import json
+import os
 import random
-import journaling.main as journal
+import re
+import subprocess
 from datetime import datetime
-from zoneinfo import ZoneInfo
-from libqtile import hook
-from libqtile import qtile
-from libqtile import bar, layout, widget
-from qtile_extras.widget import StatusNotifier, UnitStatus
-from qtile_extras.popup.toolkit import PopupGridLayout, PopupText
-from libqtile.config import Click, Drag, Group, Key, Match, Screen, ScratchPad, DropDown
-from libqtile.lazy import lazy
 from pathlib import Path
+
+import journaling.main as journal
+from libqtile import bar, hook, layout, qtile, widget
 from libqtile.backend import base
 from libqtile.backend.wayland.inputs import InputConfig
+from libqtile.config import Click, Drag, DropDown, Group, Key, Match, ScratchPad, Screen
+from libqtile.lazy import lazy
+from qtile_extras import widget as extra_widget
+from qtile_extras.popup.toolkit import PopupGridLayout, PopupText
+from zoneinfo import ZoneInfo
 
 # Set environment variables to ensure applications utilize correct settings
 os.environ["XDG_SESSION_DESKTOP"] = "qtile"
@@ -632,7 +631,7 @@ widget_list = [
     widget.TextBox(
         text="󰣇",
         foreground="FFFFFF",
-        mouse_callbacks={"Button1": lambda: qtile.cmd_hide_show_bar("bottom")},
+        mouse_callbacks={"Button1": lambda: qtile.hide_show_bar("bottom")},
     ),
     widget.TextBox(text="|", foreground=Color4),
     widget.GroupBox(
@@ -807,7 +806,7 @@ widget_list_bottom = [
     ),
     widget.Spacer(),
     widget.TextBox(text="|", foreground=Color4),
-    UnitStatus(
+    extra_widget.UnitStatus(
         bus_name="system",
         unitname="openfortivpn.service",
         label="VPN",
@@ -829,14 +828,14 @@ widget_list_bottom = [
     ),
     widget.TextBox(text="|", foreground=Color4),
     widget.Mpris2(
-        format="{xesam:title} - {xesam:artist}",
+        format="{xesam:title}",
         scroll=False,
         paused_text=" {track}",
         playing_text=" {track}",
         stopped_text="  ",
     ),
     widget.TextBox(text="|", foreground=Color4),
-    StatusNotifier(
+    extra_widget.StatusNotifier(
         menu_font="JetBrainsMono Nerd Font Propo",
         menu_foreground="#FFFFFF",
         menu_border=Color1,
@@ -1033,7 +1032,7 @@ def autostart():
 def logon():
     refresh = os.path.expanduser("~/scripts/calcurseupdate.sh")
     subprocess.Popen([refresh])
-    qtile.cmd_hide_show_bar("bottom")
+    qtile.hide_show_bar("bottom")
 
 
 # Settings that work, but we don't need anymore
