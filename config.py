@@ -5,6 +5,7 @@ import re
 import subprocess
 from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import journaling.main as journal
 from libqtile import bar, hook, layout, qtile, widget
@@ -14,7 +15,6 @@ from libqtile.config import Click, Drag, DropDown, Group, Key, Match, ScratchPad
 from libqtile.lazy import lazy
 from qtile_extras import widget as extra_widget
 from qtile_extras.popup.toolkit import PopupGridLayout, PopupText
-from zoneinfo import ZoneInfo
 
 # Set environment variables to ensure applications utilize correct settings
 os.environ["XDG_SESSION_DESKTOP"] = "qtile"
@@ -30,7 +30,7 @@ ctrl = "control"
 shift = "shift"
 
 # Set default apps
-terminal = "alacritty"
+terminal = "ghostty"
 browser = "firefox"
 explorer = "thunar"
 lock = "swaylock"
