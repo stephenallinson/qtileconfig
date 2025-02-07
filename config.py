@@ -7,14 +7,16 @@ from datetime import datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-import journaling.main as journal
 from libqtile import bar, hook, layout, qtile, widget
 from libqtile.backend import base
 from libqtile.backend.wayland.inputs import InputConfig
 from libqtile.config import Click, Drag, DropDown, Group, Key, Match, ScratchPad, Screen
 from libqtile.lazy import lazy
+from libqtile.widget.base import ThreadPoolText
 from qtile_extras import widget as extra_widget
 from qtile_extras.popup.toolkit import PopupGridLayout, PopupText
+
+import journaling.main as journal
 
 # Set environment variables to ensure applications utilize correct settings
 os.environ["XDG_SESSION_DESKTOP"] = "qtile"
@@ -41,6 +43,28 @@ app_launcher = "rofi"
 
 
 # Custom Functions
+class CustomWiFiWidget(ThreadPoolText):
+    def __init__(self, **config):
+        super().__init__("", **config)
+        self.add_callbacks({"Button1": lazy.spawn(f"{terminal} -e nmtui")})
+        self.update_interval = 5  # Refresh every 5 seconds
+
+    def poll(self):
+        try:
+            # Get Signal Strength in dBm
+            signal_dbm = subprocess.check_output(
+                "iw dev wlan0 link | grep signal | awk '{print $2}'",
+                shell=True,
+                text=True,
+            ).strip()
+            signal_dbm = int(signal_dbm)
+
+            # Convert dBm to percentage (approximate)
+            signal_percent = max(0, min(100, 2 * (signal_dbm + 100)))
+
+            return f" {signal_percent}%"
+        except Exception as e:
+            return f"Wi-Fi: {str(e)}"
 
 
 def show_journal_ideas(qtile):
@@ -717,7 +741,8 @@ widget_list = [
     widget.TextBox(text="|", foreground=Color4),
     widget.Bluetooth(
         adapter_format="󰂳 {name} [{powered}{discovery}]",
-        device="/dev_A4_C6_F0_C2_30_BD",
+        # device="/dev_A4_C6_F0_C2_30_BD",
+        device="/dev_10_91_D1_05_CD_54",
         default_text=" {num_connected_devices}",
         device_format="{symbol} {name}",
         symbol_connected="",
@@ -728,12 +753,22 @@ widget_list = [
         mouse_callbacks={"Button1": lazy.spawn(f"{home}/scripts/bluetooth.sh")},
     ),
     widget.TextBox(text="|", foreground=Color4),
-    widget.Wlan(
-        format=" {percent:2.0%}",
-        disconnected_message="󰖪 0%",
-        update_interval=30,
+    CustomWiFiWidget(
         mouse_callbacks={"Button1": lazy.spawn(f"{terminal} -e nmtui")},
     ),
+    # extra_widget.Net(
+    #     interface="wlan0",
+    #     format="{down:.0f}{down_suffix} ↓↑ {up:.0f}{up_suffix}",
+    #     mouse_callbacks={"Button1": lazy.spawn(f"{terminal} -e nmtui")},
+    # ),
+    # widget.Wlan(
+    #     interface="wlan0",
+    #     format=" {percent:2.0%}",
+    #     disconnected_message="󰖪 0%",
+    #     update_interval=1,
+    #     use_ethernet=True,
+    #     mouse_callbacks={"Button1": lazy.spawn(f"{terminal} -e nmtui")},
+    # ),
     widget.TextBox(text="|", foreground=Color4),
     widget.CPU(
         update_interval=15,
